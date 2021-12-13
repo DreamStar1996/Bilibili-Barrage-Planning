@@ -1,0 +1,44 @@
+<mat-card>
+    <form>
+        <mat-form-field>
+            <mat-label>Favorite food</mat-label>
+            <mat-select [(ngModel)]="FoodData" [ngModelOptions]="{ standalone: true }" multiple>
+                <mat-button-toggle-group #foodgroup="matButtonToggleGroup" aria-label="Font Style"
+                    (change)="foodselect(foodgroup.value)">
+                    <mat-button-toggle value="SelectAll">Select All</mat-button-toggle>
+                    <mat-button-toggle value="CancelAll">Cancel All</mat-button-toggle>
+                </mat-button-toggle-group>
+                <mat-option *ngFor="let food of foods" [value]="food.value">
+                    {{food.viewValue}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <p> Selected food: {{FoodData}} </p>
+        <p> Selected Status : {{foodgroup.value}}</p>
+    </form>
+</mat-card>
+&nbsp;
+<mat-card>
+    <form>
+        <mat-form-field>
+            <mat-label>Head Status</mat-label>
+            <mat-select [(ngModel)]="HeadStatus" [ngModelOptions]="{ standalone: true }" multiple
+                (selectionChange)="headchange($event.value)">
+                <mat-button-toggle-group #headgroup="matButtonToggleGroup" name="fooddata" aria-label="Font Style"
+                    (change)="headselect(headgroup.value)">
+                    <mat-button-toggle value="SelectAll">Select All</mat-button-toggle>
+                    <mat-button-toggle value="CancelAll">Cancel All</mat-button-toggle>
+                </mat-button-toggle-group>
+                <mat-option value="待审批">待审批</mat-option>
+                <mat-option value="已审批">已审批</mat-option>
+                <mat-option value="附件已收取">附件已收取</mat-option>
+                <mat-option value="财务已审核">财务已审核</mat-option>
+                <mat-option value="支付处理中">支付处理中</mat-option>
+                <mat-option value="待收付">待收付</mat-option>
+                <mat-option value="支付已结清">支付已结清</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <p> Selected Head Status: {{HeadStatus}} </p>
+        <p> Selected Status : {{headgroup.value}}</p>
+    </form>
+</mat-card>
