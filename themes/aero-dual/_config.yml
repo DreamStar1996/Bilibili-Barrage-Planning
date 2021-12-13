@@ -2,9 +2,8 @@
 menu:
   Home: /
   Archives: /archives
-  # change github and email values to your own addresses
-  Github: https://github.com/<your-github-username>
-  Email: mailto:<your-email-address>
+  Github: https://github.com/DreamStar1996/Bilibili-Barrage-Planning
+  Gitee: https://gitee.com/Weichen961108/Bilibili-Barrage-Planning
 rss: /atom.xml
 
 # Set to false to disable banner
