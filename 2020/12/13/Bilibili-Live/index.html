@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+  <!-- Html Head Tag-->
+  <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <!-- Open Graph Data -->
+  <meta property="og:title" content="获取bilibili直播弹幕的WebSocket协议"/>
+  <meta property="og:description" content="" />
+  <meta property="og:site_name" content="Bilibili Barrage NoteBook"/>
+  <meta property="og:type" content="article" />
+  <meta property="og:image" content="https://dreamstar1996.github.io"/>
+  
+    <link rel="alternate" href="/atom.xml" title="Bilibili Barrage NoteBook" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+
+  <!-- Site Title -->
+  <title>Bilibili Barrage NoteBook</title>
+
+  <!-- Bootstrap CSS -->
+  
+<link rel="stylesheet" href="/Bilibili-Barrage-Planning/css/bootstrap.min.css">
+
+  <!-- Custom CSS -->
+  
+  
+<link rel="stylesheet" href="/Bilibili-Barrage-Planning/css/style.light.css">
+
+
+  <!-- Google Analytics -->
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+  <body>
+    <!-- Page Header -->
+
+
+<header class="site-header header-background" style="background-image: url(/Bilibili-Barrage-Planning//img/default-banner-dark.jpg)">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="page-title with-background-image">
+          <p class="title">获取bilibili直播弹幕的WebSocket协议</p>
+          <p class="subtitle"></p>
+        </div>
+        <div class="site-menu with-background-image">
+          <ul>
+            
+              <li>
+                <a href="/Bilibili-Barrage-Planning/">
+                  
+                  Home
+                  
+                </a>
+              </li>
+            
+              <li>
+                <a href="/Bilibili-Barrage-Planning/archives">
+                  
+                  Archives
+                  
+                </a>
+              </li>
+            
+              <li>
+                <a target="_blank" rel="noopener" href="https://github.com/DreamStar1996/Bilibili-Barrage-Planning">
+                  
+                  Github
+                  
+                </a>
+              </li>
+            
+              <li>
+                <a target="_blank" rel="noopener" href="https://gitee.com/Weichen961108/Bilibili-Barrage-Planning">
+                  
+                  Gitee
+                  
+                </a>
+              </li>
+            
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<article>
+  <div class="container typo">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <div class="post-info text-muted">
+          
+            <!-- Author -->
+            <span class="author info">By John Doe</span>
+          
+          <!-- Date -->
+          <span class="date-time info">On
+            <span class="date">2020-12-13</span>
+            <span class="time">17:38:25</span>
+          </span>
+          
+          <!--  Categories  -->
+            <span class="categories info">Under 
+
+<a href="/Bilibili-Barrage-Planning/categories/WebSocket/">WebSocket</a>
+</span>
+          
+        </div>
+        <!-- Tags -->
+        
+          <div class="post-tags text-muted">
+            Tags: 
+
+<a class="tag" href="/Bilibili-Barrage-Planning/tags/Bilibili/">#Bilibili</a> <a class="tag" href="/Bilibili-Barrage-Planning/tags/WebSocket/">#WebSocket</a>
+
+
+          </div>
+        
+        <!-- Post Main Content -->
+        <div class="post-content">
+          <h2 id="连接"><a href="#连接" class="headerlink" title="连接"></a>连接</h2><p>首先URL中的ID和真正的房间ID不一样，要先请求<code>https://api.live.bilibili.com/room/v1/Room/room_init?id=URL中的ID</code>获取房间ID。返回的是JSON数据，<code>[&#39;data&#39;][&#39;room_id&#39;]</code>就是真正的房间ID</p>
+<p>然后用WebSocket连接<code>wss://broadcastlv.chat.bilibili.com:2245/sub</code></p>
+<h2 id="封包格式"><a href="#封包格式" class="headerlink" title="封包格式"></a>封包格式</h2><p>封包由头部和数据组成，字节序均为大端模式</p>
+<p>头部格式：</p>
+<table> 
+ <thead> 
+  <tr> 
+   <th>偏移量</th> 
+   <th>长度</th> 
+   <th>含义</th> 
+  </tr> 
+ </thead> 
+ <tbody> 
+  <tr> 
+   <td>0</td> 
+   <td>4</td> 
+   <td>封包总大小</td> 
+  </tr> 
+  <tr> 
+   <td>4</td> 
+   <td>2</td> 
+   <td>头部长度</td> 
+  </tr> 
+  <tr> 
+   <td>6</td> 
+   <td>2</td> 
+   <td>协议版本，目前是1</td> 
+  </tr> 
+  <tr> 
+   <td>8</td> 
+   <td>4</td> 
+   <td>操作码（封包类型）</td> 
+  </tr> 
+  <tr> 
+   <td>12</td> 
+   <td>4</td> 
+   <td>sequence，可以取常数1</td> 
+  </tr> 
+ </tbody> 
+</table>
+
+<p>已知的操作码：</p>
+<table> 
+ <thead> 
+  <tr> 
+   <th>操作码</th> 
+   <th>含义</th> 
+  </tr> 
+ </thead> 
+ <tbody> 
+  <tr> 
+   <td>2</td> 
+   <td>客户端发送的心跳包</td> 
+  </tr> 
+  <tr> 
+   <td>3</td> 
+   <td>人气值，数据不是JSON，是4字节整数</td> 
+  </tr> 
+  <tr> 
+   <td>5</td> 
+   <td>命令，数据中<code>['cmd']</code>表示具体命令</td> 
+  </tr> 
+  <tr> 
+   <td>7</td> 
+   <td>认证并加入房间</td> 
+  </tr> 
+  <tr> 
+   <td>8</td> 
+   <td>服务器发送的心跳包</td> 
+  </tr> 
+ </tbody> 
+</table>
+
+<p>数据格式：一般为JSON字符串UTF-8编码</p>
+<h2 id="认证并加入房间"><a href="#认证并加入房间" class="headerlink" title="认证并加入房间"></a>认证并加入房间</h2><p>连接后客户端先发认证包</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;uid&quot;</span>: <span class="number">0</span>表示未登录，否则为用户ID,</span><br><span class="line">  <span class="string">&quot;roomid&quot;</span>: 房间ID,</span><br><span class="line">  <span class="string">&quot;protover&quot;</span>: <span class="number">1</span>,</span><br><span class="line">  <span class="string">&quot;platform&quot;</span>: <span class="string">&quot;web&quot;</span>,</span><br><span class="line">  <span class="string">&quot;clientver&quot;</span>: <span class="string">&quot;1.4.0&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="心跳包"><a href="#心跳包" class="headerlink" title="心跳包"></a>心跳包</h2><p>客户端要每30s发一次</p>
+<h2 id="命令包"><a href="#命令包" class="headerlink" title="命令包"></a>命令包</h2><p>根据前端代码，数据也可能是多条命令的数组，不过我只收到过单条命令。每条命令中<code>[&#39;cmd&#39;]</code>表示具体命令</p>
+<p>已知的命令：</p>
+<table> 
+ <thead> 
+  <tr> 
+   <th>命令</th> 
+   <th>含义</th> 
+  </tr> 
+ </thead> 
+ <tbody> 
+  <tr> 
+   <td>DANMU_MSG</td> 
+   <td>收到弹幕</td> 
+  </tr> 
+  <tr> 
+   <td>SEND_GIFT</td> 
+   <td>有人送礼</td> 
+  </tr> 
+  <tr> 
+   <td>WELCOME</td> 
+   <td>欢迎加入房间</td> 
+  </tr> 
+  <tr> 
+   <td>WELCOME_GUARD</td> 
+   <td>欢迎房管加入房间</td> 
+  </tr> 
+  <tr> 
+   <td>SYS_MSG</td> 
+   <td>系统消息</td> 
+  </tr> 
+  <tr> 
+   <td>PREPARING</td> 
+   <td>主播准备中</td> 
+  </tr> 
+  <tr> 
+   <td>LIVE</td> 
+   <td>直播开始</td> 
+  </tr> 
+  <tr> 
+   <td>WISH_BOTTLE</td> 
+   <td>许愿瓶？</td> 
+  </tr> 
+ </tbody> 
+</table>
+
+<h3 id="收到弹幕"><a href="#收到弹幕" class="headerlink" title="收到弹幕"></a>收到弹幕</h3><p>数据示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;info&quot;</span>: [</span><br><span class="line">        [</span><br><span class="line">            <span class="number">0</span>, </span><br><span class="line">            <span class="number">1</span>, </span><br><span class="line">            <span class="number">25</span>, </span><br><span class="line">            <span class="number">16777215</span>, </span><br><span class="line">            <span class="number">1526267394</span>, </span><br><span class="line">            -<span class="number">1189421307</span>, </span><br><span class="line">            <span class="number">0</span>, </span><br><span class="line">            <span class="string">&quot;46bc1d5e&quot;</span>, </span><br><span class="line">            <span class="number">0</span></span><br><span class="line">        ], </span><br><span class="line">        <span class="string">&quot;空投！&quot;</span>, </span><br><span class="line">        [</span><br><span class="line">            <span class="number">10078392</span>, </span><br><span class="line">            <span class="string">&quot;白の驹&quot;</span>, </span><br><span class="line">            <span class="number">0</span>, </span><br><span class="line">            <span class="number">0</span>, </span><br><span class="line">            <span class="number">0</span>, </span><br><span class="line">            <span class="number">10000</span>, </span><br><span class="line">            <span class="number">1</span>, </span><br><span class="line">            <span class="string">&quot;&quot;</span></span><br><span class="line">        ], </span><br><span class="line">        [</span><br><span class="line">            <span class="number">11</span>, </span><br><span class="line">            <span class="string">&quot;狗雨&quot;</span>, </span><br><span class="line">            <span class="string">&quot;宫本狗雨&quot;</span>, </span><br><span class="line">            <span class="number">102</span>, </span><br><span class="line">            <span class="number">10512625</span>, </span><br><span class="line">            <span class="string">&quot;&quot;</span></span><br><span class="line">        ], </span><br><span class="line">        [</span><br><span class="line">            <span class="number">23</span>, </span><br><span class="line">            <span class="number">0</span>, </span><br><span class="line">            <span class="number">5805790</span>, </span><br><span class="line">            <span class="string">&quot;&gt;50000&quot;</span></span><br><span class="line">        ], </span><br><span class="line">        [</span><br><span class="line">            <span class="string">&quot;title-111-1&quot;</span>, </span><br><span class="line">            <span class="string">&quot;title-111-1&quot;</span></span><br><span class="line">        ], </span><br><span class="line">        <span class="number">0</span>, </span><br><span class="line">        <span class="number">0</span>, </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="string">&quot;uname_color&quot;</span>: <span class="string">&quot;&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line">    ], </span><br><span class="line">    <span class="string">&quot;cmd&quot;</span>: <span class="string">&quot;DANMU_MSG&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看出<code>[&#39;info&#39;][1]</code>是弹幕内容，<code>[&#39;info&#39;][2][1]</code>是弹幕作者</p>
+<h3 id="有人送礼"><a href="#有人送礼" class="headerlink" title="有人送礼"></a>有人送礼</h3><p>数据示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">&quot;cmd&quot;</span>: <span class="string">&quot;SEND_GIFT&quot;</span>, </span><br><span class="line">    <span class="string">&quot;data&quot;</span>: &#123;</span><br><span class="line">        <span class="string">&quot;giftName&quot;</span>: <span class="string">&quot;辣条&quot;</span>, </span><br><span class="line">        <span class="string">&quot;num&quot;</span>: <span class="number">7</span>, </span><br><span class="line">        <span class="string">&quot;uname&quot;</span>: <span class="string">&quot;夏目玲子swd&quot;</span>, </span><br><span class="line">        <span class="string">&quot;face&quot;</span>: <span class="string">&quot;http://i2.hdslb.com/bfs/face/9524d7af30933b5b1775cad35c84c7088973ee82.jpg&quot;</span>, </span><br><span class="line">        <span class="string">&quot;guard_level&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;rcost&quot;</span>: <span class="number">334559138</span>, </span><br><span class="line">        <span class="string">&quot;uid&quot;</span>: <span class="number">37050641</span>, </span><br><span class="line">        <span class="string">&quot;top_list&quot;</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;uid&quot;</span>: <span class="number">6179862</span>, </span><br><span class="line">                <span class="string">&quot;uname&quot;</span>: <span class="string">&quot;MiKu爬呀爬&quot;</span>, </span><br><span class="line">                <span class="string">&quot;face&quot;</span>: <span class="string">&quot;http://i0.hdslb.com/bfs/face/63f6017b9ebc90da8190b79dd43f73b5fe3a80fa.jpg&quot;</span>, </span><br><span class="line">                <span class="string">&quot;rank&quot;</span>: <span class="number">1</span>, </span><br><span class="line">                <span class="string">&quot;score&quot;</span>: <span class="number">694800</span>, </span><br><span class="line">                <span class="string">&quot;guard_level&quot;</span>: <span class="number">0</span>, </span><br><span class="line">                <span class="string">&quot;isSelf&quot;</span>: <span class="number">0</span></span><br><span class="line">            &#125;, </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;uid&quot;</span>: <span class="number">889098</span>, </span><br><span class="line">                <span class="string">&quot;uname&quot;</span>: <span class="string">&quot;CI0rHJpguwHIMZZ9&quot;</span>, </span><br><span class="line">                <span class="string">&quot;face&quot;</span>: <span class="string">&quot;http://i1.hdslb.com/bfs/face/d0c40aa0fdfe1e79603d98869875fc173c1aeebb.jpg&quot;</span>, </span><br><span class="line">                <span class="string">&quot;rank&quot;</span>: <span class="number">2</span>, </span><br><span class="line">                <span class="string">&quot;score&quot;</span>: <span class="number">618600</span>, </span><br><span class="line">                <span class="string">&quot;guard_level&quot;</span>: <span class="number">3</span>, </span><br><span class="line">                <span class="string">&quot;isSelf&quot;</span>: <span class="number">0</span></span><br><span class="line">            &#125;, </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;uid&quot;</span>: <span class="number">6573945</span>, </span><br><span class="line">                <span class="string">&quot;uname&quot;</span>: <span class="string">&quot;爱奇艺视频&quot;</span>, </span><br><span class="line">                <span class="string">&quot;face&quot;</span>: <span class="string">&quot;http://i0.hdslb.com/bfs/face/e1f0940fd35c33fbdf2f159fc520778030973287.jpg&quot;</span>, </span><br><span class="line">                <span class="string">&quot;rank&quot;</span>: <span class="number">3</span>, </span><br><span class="line">                <span class="string">&quot;score&quot;</span>: <span class="number">478000</span>, </span><br><span class="line">                <span class="string">&quot;guard_level&quot;</span>: <span class="number">0</span>, </span><br><span class="line">                <span class="string">&quot;isSelf&quot;</span>: <span class="number">0</span></span><br><span class="line">            &#125;</span><br><span class="line">        ], </span><br><span class="line">        <span class="string">&quot;timestamp&quot;</span>: <span class="number">1526267395</span>, </span><br><span class="line">        <span class="string">&quot;giftId&quot;</span>: <span class="number">1</span>, </span><br><span class="line">        <span class="string">&quot;giftType&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;action&quot;</span>: <span class="string">&quot;喂食&quot;</span>, </span><br><span class="line">        <span class="string">&quot;super&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;super_gift_num&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;price&quot;</span>: <span class="number">100</span>, </span><br><span class="line">        <span class="string">&quot;rnd&quot;</span>: <span class="string">&quot;77030604&quot;</span>, </span><br><span class="line">        <span class="string">&quot;newMedal&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;newTitle&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;medal&quot;</span>: [ ], </span><br><span class="line">        <span class="string">&quot;title&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">        <span class="string">&quot;beatId&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">        <span class="string">&quot;biz_source&quot;</span>: <span class="string">&quot;live&quot;</span>, </span><br><span class="line">        <span class="string">&quot;metadata&quot;</span>: <span class="string">&quot;&quot;</span>, </span><br><span class="line">        <span class="string">&quot;remain&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;gold&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;silver&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;eventScore&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;eventNum&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;smalltv_msg&quot;</span>: [ ], </span><br><span class="line">        <span class="string">&quot;specialGift&quot;</span>: <span class="keyword">null</span>, </span><br><span class="line">        <span class="string">&quot;notice_msg&quot;</span>: [ ], </span><br><span class="line">        <span class="string">&quot;capsule&quot;</span>: &#123;</span><br><span class="line">            <span class="string">&quot;colorful&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;coin&quot;</span>: <span class="number">0</span>, </span><br><span class="line">                <span class="string">&quot;change&quot;</span>: <span class="number">0</span>, </span><br><span class="line">                <span class="string">&quot;progress&quot;</span>: &#123;</span><br><span class="line">                    <span class="string">&quot;now&quot;</span>: <span class="number">0</span>, </span><br><span class="line">                    <span class="string">&quot;max&quot;</span>: <span class="number">5000</span> &#125;</span><br><span class="line">            &#125;, </span><br><span class="line">            <span class="string">&quot;normal&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;coin&quot;</span>: <span class="number">0</span>, </span><br><span class="line">                <span class="string">&quot;change&quot;</span>: <span class="number">0</span>, </span><br><span class="line">                <span class="string">&quot;progress&quot;</span>: &#123;</span><br><span class="line">                    <span class="string">&quot;now&quot;</span>: <span class="number">0</span>, </span><br><span class="line">                    <span class="string">&quot;max&quot;</span>: <span class="number">10000</span> &#125;</span><br><span class="line">            &#125;, </span><br><span class="line">            <span class="string">&quot;move&quot;</span>: <span class="number">1</span></span><br><span class="line">        &#125;, </span><br><span class="line">        <span class="string">&quot;addFollow&quot;</span>: <span class="number">0</span>, </span><br><span class="line">        <span class="string">&quot;effect_block&quot;</span>: <span class="number">1</span>, </span><br><span class="line">        <span class="string">&quot;coin_type&quot;</span>: <span class="string">&quot;silver&quot;</span>, </span><br><span class="line">        <span class="string">&quot;total_coin&quot;</span>: <span class="number">700</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+
+
+    <!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+        <p class="copyright text-muted">
+          Powered By <a target="_blank" href="https://dreamstar1996.github.io/Bilibili-Barrage-Planning/">Note Book</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+    <!-- After Footer Scripts -->
+
+<script src="/Bilibili-Barrage-Planning/js/highlight.pack.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function(event) {
+    var codeBlocks = Array.prototype.slice.call(document.getElementsByTagName('pre'))
+    codeBlocks.forEach(function(block, index) {
+      hljs.highlightBlock(block);
+    });
+  });
+</script>
+
+  </body>
+</html>
+
